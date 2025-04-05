@@ -81,7 +81,7 @@ def stochastic_gradient_descend(A, b, N, T = 3000, comparison = False):
     L = np.max(eigs_ATA)
 
     # 0 < alpha < 1 / 2 * L. 
-    alpha = 1 / (2 * L)
+    alpha = 1 / (15 * L)
 
     x = np.zeros(A.shape[1])
     intermediars = []
@@ -106,22 +106,56 @@ def stochastic_gradient_descend(A, b, N, T = 3000, comparison = False):
 
         intermediars.append(f(A, x, b))
 
-
-    print(f"pentru N = {N}, f* = {f(A, x, b)}")
+    print(f"-> N = {N}, f* = {f(A, x, b)}")
     return x, intermediars, err
 
-def plot_intermediars(intermediars_list, labels, title, file_name, legend_title):
+# ca sa calculez sk, voi calcula gradientul si voi adauga zgomot astfel incat eroarea gradientului aproximat sa se incadreze in limite
+def stochastic_gradient_descend_d(A, b, T = 3000):
+    test = True
+    ATA = A.T @ A
+    eigs_ATA = np.linalg.eigvals(ATA)
+
+    L = np.max(eigs_ATA)
+
+    alpha = 1 / (2 * L)
+
+    x = np.zeros(A.shape[1])
+    intermediars = []
+
+    for _ in range (1, T):
+        grad_real = gradient(A, x, b)
+
+        noise = np.random.randn(A.shape[1]) 
+        noise /= np.linalg.norm(noise)
+
+        rho_k = np.random.uniform(0.01, 0.1)
+
+        grad_aprox = grad_real + noise * rho_k
+
+        dist = np.linalg.norm(grad_real - grad_aprox)
+        if dist < 0.01 or dist > 0.1:
+            test = False
+            break
+
+        x -= alpha * grad_aprox
+
+        intermediars.append(f(A, x, b))
+
+    print(f'-> test pentru distanta: {test}')
+    print(f"-> f* = {f(A, x, b)}")
+    return x, intermediars
+
+def plot_intermediars(intermediars_list, labels, title, file_name, legend_title, labeloy = 'f(x) intermediari'):
     plt.figure(figsize=(16, 9))
     for intermediars, label in zip(intermediars_list, labels):
         plt.semilogy(range(len(intermediars)), intermediars, label=label)
     plt.xlabel('Iteratii')
-    plt.ylabel('f(x) intermediari')
+    plt.ylabel(labeloy)
     plt.title(title)
     plt.legend(title = legend_title)
     plt.grid()
     plt.yscale('log')
-    # plt.savefig(f'../plots/{file_name}.png', dpi = 300)
-    plt.show()
+    plt.savefig(f'../plots/{file_name}.png', dpi = 300)
     plt.clf()
 
 def plot_alphas(alphas_list, labels, file_name):
@@ -201,10 +235,10 @@ intermediars_list = [intermediars_constant, intermediars_steepest, intermediars_
 alphas_list = [alphas_constant, alphas_steepest, alphas_backtracking]
 labels = ['constant', 'steepest', 'backtracking']
 title = 'Strategii de alegere a pasului de gradient pentru Gradient Descend'
-file_name = 'gradient_descend_f'
+file_name = 'gradient_descend_f_b'
 legend_title = 'alpha_method'
-# plot_intermediars(intermediars_list, labels, title, file_name, legend_title)
-# plot_alphas(alphas_list, labels, 'gradient_descend_alpha')
+plot_intermediars(intermediars_list, labels, title, file_name, legend_title)
+plot_alphas(alphas_list, labels, 'gradient_descend_alpha_b')
 
 
 # c)
@@ -218,9 +252,11 @@ for n in N:
     intermediars_list.append(intermediars_stochastic)
     errors.append(error)
     labels.append(f'N = {n}')
-# plot_intermediars(intermediars_list, labels, 'Stochastic Gradient Descend Number of Samples Comparison', 'stochastic_gradient_descend', 'num_samples')
-plot_intermediars([errors[0]], [labels[0]], 'Stochastic Gradient Descend Gradient Error Comparison', 'stochastic_gradient_descend_err', 'num_samples')
+plot_intermediars(intermediars_list, labels, 'Stochastic Gradient Descend Number of Samples Comparison', 'stochastic_gradient_descend_c', 'num_samples')
+plot_intermediars([errors[0]], [labels[0]], 'Stochastic Gradient Descend Gradient Error Comparison', 'stochastic_gradient_descend_err_c', 'num_samples', labeloy = 'error')
 
 
 # d)
-
+print("\n\n-- Stochastic Gradient Descend (with gradient 0.01 < aproximation error < 0.1) --")
+x_star, intermediars_stochastic_d = stochastic_gradient_descend_d(A, b)
+plot_intermediars([intermediars_stochastic_d], ['gradient'], 'Stochastic Gradient Descend (with gradient 0.01 < aproximation error < 0.1)', 'stochastic_gradient_descend_d', '')
