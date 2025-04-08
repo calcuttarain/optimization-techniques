@@ -120,12 +120,10 @@ def stochastic_gradient_descend(A, b, N, beta = 0.4, T = 3000, comparison = Fals
 
         grad_aprox = A_selected.T @ (A_selected @ x - b_selected) / N
 
-        # eroarea de aproximare a gradientului este mare, aprox. 10^6. din cauza numarului de conditionare mare
-        # => "omitem" directii puternice cand facem acel sampling 
         if comparison:
             grad_real = gradient(A, x, b)
             dist = grad_real - grad_aprox
-            err.append(np.linalg.norm(dist) / np.linalg.norm(grad_real)) # aduc la norma gradientului ca sa vizualizez mai bine
+            err.append(np.linalg.norm(dist)) 
 
         x -= (alpha / (k ** beta)) * grad_aprox
 
@@ -180,8 +178,7 @@ def plot_intermediars(intermediars_list, labels, title, file_name, legend_title,
     plt.legend(title = legend_title)
     plt.grid()
     plt.yscale('log')
-    # plt.savefig(f'../plots/1_{file_name}.png', dpi = 300)
-    plt.show()
+    plt.savefig(f'../plots/1_{file_name}.png', dpi = 300)
     plt.clf()
 
 def plot_alphas(alphas_list, labels, file_name):
@@ -239,8 +236,8 @@ labels = ['constant', 'steepest', 'backtracking']
 title = 'Strategii de alegere a pasului de gradient pentru Gradient Descend'
 file_name = 'gradient_descend_f_b'
 legend_title = 'alpha_method'
-# plot_intermediars(intermediars_list, labels, title, file_name, legend_title)
-# plot_alphas(alphas_list, labels, 'gradient_descend_alpha_b')
+plot_intermediars(intermediars_list, labels, title, file_name, legend_title)
+plot_alphas(alphas_list, labels, 'gradient_descend_alpha_b')
 
 
 # c)
@@ -255,10 +252,10 @@ for n in N:
     errors.append(error)
     labels.append(f'N = {n}')
 plot_intermediars(intermediars_list, labels, 'Stochastic Gradient Descend Number of Samples Comparison', 'stochastic_gradient_descend_c', 'num_samples')
-# plot_intermediars([errors[0]], [labels[0]], 'Stochastic Gradient Descend Gradient Error Comparison', 'stochastic_gradient_descend_err_c', 'num_samples', labeloy = 'error')
+plot_intermediars(errors, labels, 'Stochastic Gradient Descend Gradient Error Comparison', 'stochastic_gradient_descend_err_c', 'num_samples', labeloy = r'$\|\nabla f - g\|$')
 
 
 # d)
 print("\n\n-- Stochastic Gradient Descend (with gradient 0.01 < aproximation error < 0.1) --")
 x_star, intermediars_stochastic_d = stochastic_gradient_descend_d(A, b)
-# plot_intermediars([intermediars_stochastic_d], ['gradient'], 'Stochastic Gradient Descend (with gradient 0.01 < aproximation error < 0.1)', 'stochastic_gradient_descend_d', '')
+plot_intermediars([intermediars_stochastic_d], ['gradient'], 'Stochastic Gradient Descend (with gradient 0.01 < aproximation error < 0.1)', 'stochastic_gradient_descend_d', '')
