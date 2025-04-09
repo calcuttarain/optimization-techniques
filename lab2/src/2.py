@@ -202,80 +202,70 @@ plot_sedii_depozite(A, nr_sedii, 'a_gd_init_2d', W, title = 'Conexiune sedii si 
 
 A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
 
-plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
-plot_sedii_depozite(A, nr_sedii, 'a_result_gd_2d', W, title = 'Conexiune sedii si coordonate finale depozite')
+plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', f'a_gd_neponderat_p={p}', '')
+plot_sedii_depozite(A, nr_sedii, f'a_result_gd_2d_p={p}', W, title = 'Conexiune sedii si coordonate finale depozite')
 
 # 3d
-dimensiune = 3
-
-sedii = genereaza_sedii(nr_sedii, dimensiune)
-depozite = init_depozite(nr_depozite, dimensiune)
-
-W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
-A = np.vstack((sedii, depozite))
-
-plot_sedii_depozite(A, nr_sedii, 'a_gd_init_3d', W, title = 'Conexiune sedii si coordonate initiale depozite')
-
-A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
-
-plot_sedii_depozite(A, nr_sedii, 'a_result_gd_3d', W, title = 'Conexiune sedii si coordonate finale depozite')
-
-
-# ponderat
-nr_sedii = 100
-nr_depozite = 70
-dimensiune = 3
-
-sedii = genereaza_sedii(nr_sedii, dimensiune)
-depozite = init_depozite(nr_depozite, dimensiune)
-
-W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = True)
-A = np.vstack((sedii, depozite))
-
-A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
-plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_ponderat', '')
+# dimensiune = 3
+#
+# sedii = genereaza_sedii(nr_sedii, dimensiune)
+# depozite = init_depozite(nr_depozite, dimensiune)
+#
+# W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
+# A = np.vstack((sedii, depozite))
+#
+# plot_sedii_depozite(A, nr_sedii, 'a_gd_init_3d', W, title = 'Conexiune sedii si coordonate initiale depozite')
+#
+# A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
+#
+# plot_sedii_depozite(A, nr_sedii, 'a_result_gd_3d', W, title = 'Conexiune sedii si coordonate finale depozite')
 
 
 # b
-nr_sedii = 10
-nr_depozite = 6
-dimensiune = 2
-
-p = 1
-
-sedii = genereaza_sedii(nr_sedii, dimensiune)
-depozite = init_depozite(nr_depozite, dimensiune)
-
-W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
-A = np.vstack((sedii, depozite))
-
-A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
-
-plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
-
+# nr_sedii = 10
+# nr_depozite = 6
+# dimensiune = 2
+#
+# p = 1
+#
+# sedii = genereaza_sedii(nr_sedii, dimensiune)
+# depozite = init_depozite(nr_depozite, dimensiune)
+#
+# # o fac fara cost ca sa fie mai usor de vizualizat rezultatul
+# # 2d
+# W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
+# A = np.vstack((sedii, depozite))
+#
+# plot_sedii_depozite(A, nr_sedii, 'a_gd_init_2d', W, title = 'Conexiune sedii si coordonate initiale depozite')
+#
+# A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
+#
+# plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
+# plot_sedii_depozite(A, nr_sedii, 'a_result_gd_2d', W, title = 'Conexiune sedii si coordonate finale depozite')
+#
 
 # c
-p = 1 / 2
-
-sedii = genereaza_sedii(nr_sedii, dimensiune)
-depozite = init_depozite(nr_depozite, dimensiune)
-
-W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
-A = np.vstack((sedii, depozite))
-
-A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
-
-plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
-
-p = 3 / 2
-
-sedii = genereaza_sedii(nr_sedii, dimensiune)
-depozite = init_depozite(nr_depozite, dimensiune)
-
-W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
-A = np.vstack((sedii, depozite))
-
-A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
-
-plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
+# p = 1 / 2
+#
+# sedii = genereaza_sedii(nr_sedii, dimensiune)
+# depozite = init_depozite(nr_depozite, dimensiune)
+#
+# W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
+# A = np.vstack((sedii, depozite))
+#
+# A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
+#
+# plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
+#
+# p = 3 / 2
+#
+# sedii = genereaza_sedii(nr_sedii, dimensiune)
+# depozite = init_depozite(nr_depozite, dimensiune)
+#
+# W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
+# A = np.vstack((sedii, depozite))
+#
+# A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
+#
+# plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
 
