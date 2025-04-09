@@ -4,12 +4,21 @@ import matplotlib.pyplot as plt
 np.random.seed(22)
 
 def gradient(A, x, b):
+    """
+    Calculeaza gradientul functiei in punctul x.
+    """
     return np.matmul(A.T, np.matmul(A, x) - b)
 
 def f(A, x, b):
+    """
+    Calculeaza valoarea functiei in punctul x.
+    """
     return 1 / 2 * np.linalg.norm(np.matmul(A, x) - b) ** 2
 
 def generate_A_b(m, n):
+    """
+    Genereaza matricea A si vectorul b cu K > 10**6 si V* > 10**3.
+    """
     r = min(m, n)
     sigma_max = 10 ** 5
     sigma_min = 1
@@ -34,6 +43,9 @@ def generate_A_b(m, n):
     return A, b
 
 def test(A, b):
+    """
+    Testeaza matricea A si vectorul b cu K > 10**6 si V* > 10**3.
+    """
     ATA = A.T @ A
     eigenvalues_ATA = np.linalg.eigvals(ATA)
 
@@ -48,7 +60,11 @@ def test(A, b):
     print(f"V* = {V_star}")
     print(f"V* > 10^3? {V_star > 10**3}")
 
-def gradient_descend(A, b, e = 1e3, x0 = None, alpha_method = "constant", alpha_constant = None, rho = 0.5, c = 0.5, max_iter = 100000):
+def gradient_descend(A, b, e = 1, x0 = None, alpha_method = "constant", alpha_constant = None, rho = 0.5, c = 0.5, max_iter = 100000):
+    """
+    Testeaza matricea A si vectorul b cu K > 10**6 si V* > 10**3.
+    """
+
     ATA = A.T @ A
     eigs_ATA = np.linalg.eigvals(ATA)
 
@@ -252,6 +268,7 @@ for n in N:
     errors.append(error)
     labels.append(f'N = {n}')
 plot_intermediars(intermediars_list, labels, 'Stochastic Gradient Descend Number of Samples Comparison', 'stochastic_gradient_descend_c', 'num_samples')
+# scaderea erorii aproximarii este un efect al apropierii gradientului de 0
 plot_intermediars(errors, labels, 'Stochastic Gradient Descend Gradient Error Comparison', 'stochastic_gradient_descend_err_c', 'num_samples', labeloy = r'$\|\nabla f - g\|$')
 
 
