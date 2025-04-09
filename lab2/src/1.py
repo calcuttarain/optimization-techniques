@@ -61,10 +61,6 @@ def test(A, b):
     print(f"V* > 10^3? {V_star > 10**3}")
 
 def gradient_descend(A, b, e = 1, x0 = None, alpha_method = "constant", alpha_constant = None, rho = 0.5, c = 0.5, max_iter = 100000):
-    """
-    Testeaza matricea A si vectorul b cu K > 10**6 si V* > 10**3.
-    """
-
     ATA = A.T @ A
     eigs_ATA = np.linalg.eigvals(ATA)
 
