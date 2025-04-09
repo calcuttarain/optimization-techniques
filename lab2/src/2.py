@@ -243,6 +243,9 @@ plot_sedii_depozite(A, nr_sedii, f'a_result_gd_2d_p={p}', W, title = 'Conexiune 
 # plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
 # plot_sedii_depozite(A, nr_sedii, 'a_result_gd_2d', W, title = 'Conexiune sedii si coordonate finale depozite')
 #
+'''
+metodele nu functioneaza cand punctele xi si xj sunt destul de apropiate una de alta, se apropie de punctul in care functia norma nu mai e derivabila
+'''
 
 # c
 # p = 1 / 2
@@ -269,3 +272,9 @@ plot_sedii_depozite(A, nr_sedii, f'a_result_gd_2d_p={p}', W, title = 'Conexiune 
 #
 # plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
 
+
+'''
+concluzie: 
+1) pentru puteri mai mari decat 2, gradientul ajunge la solutie in mai multi pasi si are o cautare mai smooth
+2) pentru varianta cu matrice fara cost, pentru valori mai mari decat 2, pozitiile depozitelor tind sa se duca in acelasi punct, fata de valori mai mici ca 1 cand tind sa se indeparteze
+''' 
