@@ -197,7 +197,7 @@ depozite = init_depozite(nr_depozite, dimensiune)
 W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
 A = np.vstack((sedii, depozite))
 
-plot_sedii_depozite(A, nr_sedii, 'a_sgd_init', W, title = 'Conexiune sedii si coordonate initiale depozite')
+plot_sedii_depozite(A, nr_sedii, 'a_gd_init', W, title = 'Conexiune sedii si coordonate initiale depozite')
 
 A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
 
