@@ -173,22 +173,22 @@ def plot_trend_time_series(trend, time_series, n, labels, title, file_name):
     
     plt.close()
 
-def plot_x_hp_vs_x_l1(x_hp, x_l1, time_series, n):
+def plot_x_hp_vs_x_l1(x_hp, x_l1, time_series, n, label, title, file_name):
     t = np.arange(n)
     
     plt.figure(figsize=(16, 9))
     
-    plt.plot(t, time_series, label = r'$y_t$', color='red')  
+    plt.plot(t, time_series, label = label, color='red')  
     plt.plot(t, x_l1, label = r'$\hat{x}_{\ell_1}$', color='black')
     plt.plot(t, x_hp, label = '$x_{HP}$', color='purple')
     
-    plt.title('x_HP vs x_l1')  
+    plt.title(title)  
     plt.xlabel('time')
     plt.ylabel('value')
     plt.grid(True)
     plt.legend()
     
-    plt.savefig('../plots/e_x_hp_vs_x_l1_2.png', dpi=300)
+    plt.savefig(f'../plots/{file_name}.png', dpi=300)
     
     plt.close()
 
@@ -254,6 +254,9 @@ plot_trend_time_series(x_l1, time_series, n, [r'$\hat{x}_{\ell_1}$', r'$y_t$'], 
 
 
 # d
+'''
+functioneaza si pentru n > 10 ** 4, dar e mai clara diferenta pe plot pentru un 
+'''
 n = 1000
 sigma = 2.5 
 probability = 0.9
@@ -271,8 +274,18 @@ plot_trend_time_series(x_hp, time_series, n, [r'$x_{HP}$', r'$y_t$'], f'Solutia 
 miu_star = mgp(time_series, rho, n)
 x_l1 = time_series - compute_DTx(miu_star)
 
-plot_trend_time_series(x_hp, x_l1, n, ['$x_{HP}$', r'$\hat{x}_{\ell_1}$'], f'Solutia Modelului HP vs Solutia l1 pentru rho = {rho}', 'e_x_hp_vs_x_l1_1')
-plot_x_hp_vs_x_l1(x_hp, x_l1, time_series, n)
+plot_trend_time_series(x_hp[:1000], x_l1[:1000], 1000, ['$x_{HP}$', r'$\hat{x}_{\ell_1}$'], f'Solutia Modelului HP vs Solutia l1 pentru rho = {rho}', 'e_x_hp_vs_x_l1_1')
+
+label = r'$y_t$'
+file_name = 'e_x_hp_vs_x_l1_2'
+title = 'HP vs L1 vs Time Series'
+plot_x_hp_vs_x_l1(x_hp[:1000], x_l1[:1000], time_series, 1000, label, title, file_name)
+
+label = 'actual' + r'$x_t$'
+file_name = 'e_x_hp_vs_x_l1_3'
+title = 'HP vs L1 vs Actual Trend'
+plot_x_hp_vs_x_l1(x_hp[:1000], x_l1[:1000], trend, 1000, label, title, file_name)
+
 
 '''
 x_hp e mai smooth, penalizeaza mai mult din diferentele mai mari spre deosebire de x_l1
