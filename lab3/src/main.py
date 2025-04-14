@@ -5,6 +5,7 @@ import scipy
 
 np.random.seed(22)
 
+# generatoare
 def generate_time_series(n, sigma, p):
     noise = np.random.normal(0, sigma ** 2, n)
     p_tresholds = np.random.rand(n)
@@ -30,6 +31,7 @@ def generate_difference_matrix(n):
     D = scipy.sparse.diags(diagonals, offsets, shape=(n - 2, n)).toarray()
     return D
 
+# pentru cvxpy
 def filter_function(x, y, D, rho):
     fidelity = 1 / 2 * (cp.norm(x - y, 2) ** 2)
     smoothness = rho * cp.norm(D @ x, 1)
@@ -38,6 +40,7 @@ def filter_function(x, y, D, rho):
 
     return filter
 
+# mgp
 '''
 ca sa mearga mgp pentru n > 10 ** 4, matricea D este prea mare pentru a fi stocata in memorie 
 trebuie sa aplic functia de convolutie pe x echivalenta cu Dx
@@ -85,7 +88,7 @@ def mgp(y, rho, n, e = 1e-2, p = 0.5, c = 0.5, max_iter = 1000):
         f_x_k_next = f_lagrange(projection(miu - alpha_k * grad_miu, rho), y)
         g_x_k = g(miu, alpha_k, grad_miu, rho)
 
-        while f_x_k_next < (f_x_k - c * alpha_k * np.linalg.norm(g_x_k) ** 2):
+        while f_x_k_next <= (f_x_k - c * alpha_k * np.linalg.norm(g_x_k) ** 2):
             alpha_k = p * alpha_k
 
             miu_proj = projection(miu - alpha_k * grad_miu, rho)
@@ -98,12 +101,13 @@ def mgp(y, rho, n, e = 1e-2, p = 0.5, c = 0.5, max_iter = 1000):
 
         miu = projection(miu - alpha_k * grad_miu, rho)
 
-        if np.linalg.norm(g_x_k) < e:
+        if np.linalg.norm(g_x_k) <= e:
             print(f"minim gasit dupa {i} iteratii")
             break
 
     return miu
 
+# x_hp
 def solve_x_hp(y, rho, n, D):
     A = np.eye(n) + 2 * rho * D.T @ D
     '''
@@ -155,6 +159,7 @@ def solve_x_hp(y, rho, n, D):
     
     return x
 
+# functii pentru plot
 def plot_trend_time_series(trend, time_series, n, labels, title, file_name):
     t = np.arange(n)
     
@@ -254,37 +259,22 @@ plot_trend_time_series(x_l1, time_series, n, [r'$\hat{x}_{\ell_1}$', r'$y_t$'], 
 
 
 # d
-'''
-functioneaza si pentru n > 10 ** 4, dar e mai clara diferenta pe plot pentru un 
-'''
-n = 1000
-sigma = 2.5 
-probability = 0.9
-
-trend, time_series, noise, v = generate_time_series(n, sigma, probability)
-D = generate_difference_matrix(n)
-
-rho = 10
-
 x_hp = solve_x_hp(time_series, rho, n, D)
 plot_trend_time_series(x_hp, time_series, n, [r'$x_{HP}$', r'$y_t$'], f'Solutia Modelului Hodrick-Prescott pentru rho = {rho}', 'd_x_hp')
 
 
 # e
-miu_star = mgp(time_series, rho, n)
-x_l1 = time_series - compute_DTx(miu_star)
-
 plot_trend_time_series(x_hp[:1000], x_l1[:1000], 1000, ['$x_{HP}$', r'$\hat{x}_{\ell_1}$'], f'Solutia Modelului HP vs Solutia l1 pentru rho = {rho}', 'e_x_hp_vs_x_l1_1')
 
 label = r'$y_t$'
 file_name = 'e_x_hp_vs_x_l1_2'
-title = 'HP vs L1 vs Time Series'
-plot_x_hp_vs_x_l1(x_hp[:1000], x_l1[:1000], time_series, 1000, label, title, file_name)
+title = f'HP vs L1 vs Time Series, rho = {rho}'
+plot_x_hp_vs_x_l1(x_hp[:1000], x_l1[:1000], time_series[:1000], 1000, label, title, file_name)
 
 label = 'actual' + r'$x_t$'
 file_name = 'e_x_hp_vs_x_l1_3'
-title = 'HP vs L1 vs Actual Trend'
-plot_x_hp_vs_x_l1(x_hp[:1000], x_l1[:1000], trend, 1000, label, title, file_name)
+title = f'HP vs L1 vs Actual Trend, rho = {rho}'
+plot_x_hp_vs_x_l1(x_hp[:1000], x_l1[:1000], trend[:1000], 1000, label, title, file_name)
 
 
 '''
