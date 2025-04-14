@@ -74,7 +74,9 @@ def g(x, alpha, grad_x, rho):
 def f_lagrange(miu, y):
     return (- 1 / 2) * np.linalg.norm(compute_DTx(miu)) ** 2 + miu.T @ compute_Dx(y)
 
-def mgp(y, rho, n, e = 1e-2, p = 0.5, c = 0.5, max_iter = 1000):
+# cand ajunge aproape de treshold(are norma cam 1 virgula ceva), incepe sa sara la valori mai mari daca pastrez p = 0.5 si c = 0.01
+# pentru p = 0.55, c = 0.01, minim gasit dupa 8655 iteratii
+def mgp(y, rho, n, e = 1e-2, p = 0.65, c = 0.01, max_iter = 1000000):
     miu = np.zeros(n - 2)
     miu = projection(miu, rho)
 
@@ -101,6 +103,7 @@ def mgp(y, rho, n, e = 1e-2, p = 0.5, c = 0.5, max_iter = 1000):
 
         miu = projection(miu - alpha_k * grad_miu, rho)
 
+        print(np.linalg.norm(g_x_k))
         if np.linalg.norm(g_x_k) <= e:
             print(f"minim gasit dupa {i} iteratii")
             break
@@ -119,43 +122,43 @@ def solve_x_hp(y, rho, n, D):
     
     for i in range(n):
         if i == 0:
-            U[0, 0] = A[0, 0]
-            U[0, 1] = A[0, 1]
+            U[0][0] = A[0][0]
+            U[0][1] = A[0][1]
             if n > 2:
-                U[0, 2] = A[0, 2]
+                U[0][2] = A[0][2]
         elif i == 1:
-            L[1, 0] = A[1, 0] / U[0, 0]
-            U[1, 1] = A[1, 1] - L[1, 0] * U[0, 1]
-            U[1, 2] = A[1, 2] - L[1, 0] * U[0, 2] if n > 2 else 0
+            L[1][0] = A[1][0] / U[0][0]
+            U[1][1] = A[1][1] - L[1][0] * U[0][1]
+            U[1][2] = A[1][2] - L[1][0] * U[0][2] if n > 2 else 0
             if n > 3:
-                U[1, 3] = A[1, 3]
+                U[1][3] = A[1][3]
         else:
             if i >= 2:
-                L[i, i-2] = A[i, i-2] / U[i-2, i-2]
-            L[i, i-1] = (A[i, i-1] - (L[i, i-2] * U[i-2, i-1] if i >= 2 else 0)) / U[i-1, i-1]
-            U[i, i] = A[i, i] - L[i, i-1] * U[i-1, i] - (L[i, i-2] * U[i-2, i] if i >= 2 else 0)
+                L[i][i-2] = A[i][i-2] / U[i-2][i-2]
+            L[i][i-1] = (A[i][i-1] - (L[i][i-2] * U[i-2][i-1] if i >= 2 else 0)) / U[i-1][i-1]
+            U[i][i] = A[i][i] - L[i][i-1] * U[i-1][i] - (L[i][i-2] * U[i-2][i] if i >= 2 else 0)
             if i < n-1:
-                U[i, i+1] = A[i, i+1] - L[i, i-1] * U[i-1, i+1] - (L[i, i-2] * U[i-2, i+1] if i >= 2 else 0)
+                U[i][i+1] = A[i][i+1] - L[i][i-1] * U[i-1][i+1] - (L[i][i-2] * U[i-2][i+1] if i >= 2 else 0)
             if i < n-2:
-                U[i, i+2] = A[i, i+2] - L[i, i-1] * U[i-1, i+2] - (L[i, i-2] * U[i-2, i+2] if i >= 2 else 0)
+                U[i][i+2] = A[i][i+2] - L[i][i-1] * U[i-1][i+2] - (L[i][i-2] * U[i-2][i+2] if i >= 2 else 0)
     
     z = np.zeros(n)
     for i in range(n):
         if i == 0:
             z[0] = y[0]
         elif i == 1:
-            z[1] = y[1] - L[1, 0] * z[0]
+            z[1] = y[1] - L[1][0] * z[0]
         else:
-            z[i] = y[i] - L[i, i-1] * z[i-1] - (L[i, i-2] * z[i-2] if i >= 2 else 0)
+            z[i] = y[i] - L[i][i-1] * z[i-1] - (L[i][i-2] * z[i-2] if i >= 2 else 0)
     
     x = np.zeros(n)
     for i in range(n-1, -1, -1):
         if i == n-1:
-            x[i] = z[i] / U[i, i]
+            x[i] = z[i] / U[i][i]
         elif i == n-2:
-            x[i] = (z[i] - U[i, i+1] * x[i+1]) / U[i, i]
+            x[i] = (z[i] - U[i][i+1] * x[i+1]) / U[i][i]
         else:
-            x[i] = (z[i] - U[i, i+1] * x[i+1] - U[i, i+2] * x[i+2]) / U[i, i]
+            x[i] = (z[i] - U[i][i+1] * x[i+1] - U[i][i+2] * x[i+2]) / U[i][i]
     
     return x
 
