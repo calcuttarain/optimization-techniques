@@ -74,9 +74,9 @@ def g(x, alpha, grad_x, rho):
 def f_lagrange(miu, y):
     return (- 1 / 2) * np.linalg.norm(compute_DTx(miu)) ** 2 + miu.T @ compute_Dx(y)
 
-# cand ajunge aproape de treshold(are norma cam 1 virgula ceva), incepe sa sara la valori mai mari daca pastrez p = 0.5 si c = 0.01
+# cand ajunge aproape de 0, norma (G(x) incepe sa sara la valori mai mari daca pastrez p = 0.5 si c = 0.01
 # pentru p = 0.55, c = 0.01, minim gasit dupa 8655 iteratii
-def mgp(y, rho, n, e = 1e-2, p = 0.65, c = 0.01, max_iter = 1000000):
+def mgp(y, rho, n, e = 1e-2, p = 0.55, c = 0.01, max_iter = 1000000):
     miu = np.zeros(n - 2)
     miu = projection(miu, rho)
 
@@ -103,7 +103,7 @@ def mgp(y, rho, n, e = 1e-2, p = 0.65, c = 0.01, max_iter = 1000000):
 
         miu = projection(miu - alpha_k * grad_miu, rho)
 
-        print(np.linalg.norm(g_x_k))
+        # print(np.linalg.norm(g_x_k))
         if np.linalg.norm(g_x_k) <= e:
             print(f"minim gasit dupa {i} iteratii")
             break
@@ -120,6 +120,7 @@ def solve_x_hp(y, rho, n, D):
     L = np.zeros((n, n))
     U = np.zeros((n, n))
     
+    # calculez matricile L si U
     for i in range(n):
         if i == 0:
             U[0][0] = A[0][0]
@@ -142,6 +143,7 @@ def solve_x_hp(y, rho, n, D):
             if i < n-2:
                 U[i][i+2] = A[i][i+2] - L[i][i-1] * U[i-1][i+2] - (L[i][i-2] * U[i-2][i+2] if i >= 2 else 0)
     
+    # calculez Lz = y
     z = np.zeros(n)
     for i in range(n):
         if i == 0:
@@ -151,6 +153,7 @@ def solve_x_hp(y, rho, n, D):
         else:
             z[i] = y[i] - L[i][i-1] * z[i-1] - (L[i][i-2] * z[i-2] if i >= 2 else 0)
     
+    # calculez solutia sistemului Ux = z
     x = np.zeros(n)
     for i in range(n-1, -1, -1):
         if i == n-1:
