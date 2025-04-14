@@ -167,7 +167,8 @@ def plot_sedii_depozite(coords, m, file_name, W = None, title = ''):
         ax.set_title(title)
         ax.legend()
 
-    plt.savefig(f'../plots/2_{file_name}.png', dpi = 300)
+    # plt.savefig(f'../plots/2_{file_name}.png', dpi = 300)
+    plt.show()
     plt.clf()
 
 def plot_intermediars(intermediars_list, labels, title, file_name, legend_title, labeloy = 'f(x) intermediari'):
@@ -180,7 +181,8 @@ def plot_intermediars(intermediars_list, labels, title, file_name, legend_title,
     plt.legend(title = legend_title)
     plt.grid()
     plt.yscale('log')
-    plt.savefig(f'../plots/2_{file_name}.png', dpi = 300)
+    # plt.savefig(f'../plots/2_{file_name}.png', dpi = 300)
+    plt.show()
     plt.clf()
 
 # a)
@@ -222,26 +224,23 @@ plot_sedii_depozite(A, nr_sedii, f'a_result_gd_2d_p={p}', W, title = 'Conexiune 
 
 
 # b
-# nr_sedii = 10
-# nr_depozite = 6
-# dimensiune = 2
-#
-# p = 1
-#
-# sedii = genereaza_sedii(nr_sedii, dimensiune)
-# depozite = init_depozite(nr_depozite, dimensiune)
-#
-# # o fac fara cost ca sa fie mai usor de vizualizat rezultatul
-# # 2d
-# W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
-# A = np.vstack((sedii, depozite))
-#
-# plot_sedii_depozite(A, nr_sedii, 'a_gd_init_2d', W, title = 'Conexiune sedii si coordonate initiale depozite')
-#
-# A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
-#
-# plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
-# plot_sedii_depozite(A, nr_sedii, 'a_result_gd_2d', W, title = 'Conexiune sedii si coordonate finale depozite')
+
+p = 1
+
+sedii = genereaza_sedii(nr_sedii, dimensiune)
+depozite = init_depozite(nr_depozite, dimensiune)
+
+# o fac fara cost ca sa fie mai usor de vizualizat rezultatul
+# 2d
+W = genereaza_matrice_adiacenta(nr_sedii, nr_depozite, ponderata = False)
+A = np.vstack((sedii, depozite))
+
+plot_sedii_depozite(A, nr_sedii, 'a_gd_init_2d', W, title = 'Conexiune sedii si coordonate initiale depozite')
+
+A, intermediars, errors = gradient_descend(A, W, p, nr_sedii)
+
+plot_intermediars([intermediars], ['f(x)'], f'Gradient Descend, p = {p}', 'a_gd_neponderat', '')
+plot_sedii_depozite(A, nr_sedii, 'a_result_gd_2d', W, title = 'Conexiune sedii si coordonate finale depozite')
 #
 '''
 metodele nu functioneaza cand punctele xi si xj sunt destul de apropiate una de alta, se apropie de punctul in care functia norma nu mai e derivabila
