@@ -249,7 +249,6 @@ plot_cvxpy_results(results, labels, n)
 rho = 10
 miu_star = mgp(time_series, rho, n)
 x_l1 = time_series - compute_DTx(miu_star)
-x_l1 = time_series - D.T @ miu_star
 
 plot_trend_time_series(x_l1, time_series, n, [r'$\hat{x}_{\ell_1}$', r'$y_t$'], f'Metoda Gradient Proiectat pentru rho = {rho}', 'c_mgp')
 
@@ -269,8 +268,8 @@ plot_trend_time_series(x_hp, time_series, n, [r'$x_{HP}$', r'$y_t$'], f'Solutia 
 
 
 # e
-miu_star = mgp(time_series, rho, D, n)
-x_l1 = time_series - D.T @ miu_star
+miu_star = mgp(time_series, rho, n)
+x_l1 = time_series - compute_DTx(miu_star)
 
 plot_trend_time_series(x_hp, x_l1, n, ['$x_{HP}$', r'$\hat{x}_{\ell_1}$'], f'Solutia Modelului HP vs Solutia l1 pentru rho = {rho}', 'e_x_hp_vs_x_l1_1')
 plot_x_hp_vs_x_l1(x_hp, x_l1, time_series, n)
