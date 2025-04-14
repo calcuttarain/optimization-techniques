@@ -59,8 +59,8 @@ def compute_Dx(x):
         Dx[i] = x[i] - 2 * x[i + 1] + x[i + 2]  
     return Dx
 
-def gradient(x, y, D):
-    return np.matmul(D, np.matmul(D.T, x) - y)
+def gradient(x, y):
+    return compute_Dx(compute_DTx(x) - y)
 
 def projection(x, rho):
     return np.maximum(-rho, np.minimum(rho, x))
@@ -68,28 +68,28 @@ def projection(x, rho):
 def g(x, alpha, grad_x, rho):
     return 1 / alpha * (x - projection(x - alpha * grad_x, rho))
 
-def f_lagrange(miu, y, D):
-    return (- 1 / 2) * np.linalg.norm(D.T @ miu) ** 2 + miu.T @ D @ y
+def f_lagrange(miu, y):
+    return (- 1 / 2) * np.linalg.norm(compute_DTx(miu)) ** 2 + miu.T @ compute_Dx(y)
 
-def mgp(y, rho, D, n, e = 1e-2, p = 0.5, c = 0.5, max_iter = 1000):
+def mgp(y, rho, n, e = 1e-2, p = 0.5, c = 0.5, max_iter = 1000):
     miu = np.zeros(n - 2)
     miu = projection(miu, rho)
 
     for i in range (max_iter):
-        grad_miu = gradient(miu, y, D)
+        grad_miu = gradient(miu, y)
 
         alpha_k = 1.0
         t = 0
 
-        f_x_k = f_lagrange(miu, y, D)
-        f_x_k_next = f_lagrange(projection(miu - alpha_k * grad_miu, rho), y, D)
+        f_x_k = f_lagrange(miu, y)
+        f_x_k_next = f_lagrange(projection(miu - alpha_k * grad_miu, rho), y)
         g_x_k = g(miu, alpha_k, grad_miu, rho)
 
         while f_x_k_next < (f_x_k - c * alpha_k * np.linalg.norm(g_x_k) ** 2):
             alpha_k = p * alpha_k
 
             miu_proj = projection(miu - alpha_k * grad_miu, rho)
-            f_x_k_next = f_lagrange(miu_proj, y, D)
+            f_x_k_next = f_lagrange(miu_proj, y)
             g_x_k = 1 / alpha_k * (miu - miu_proj)
 
             if t > 100:
@@ -212,7 +212,7 @@ def plot_cvxpy_results(results, labels, n):
 
 
 # a
-n = 1000
+n = 10000
 sigma = 2.5 
 probability = 0.9
 
@@ -247,7 +247,8 @@ plot_cvxpy_results(results, labels, n)
 
 # c
 rho = 10
-miu_star = mgp(time_series, rho, D, n)
+miu_star = mgp(time_series, rho, n)
+x_l1 = time_series - compute_DTx(miu_star)
 x_l1 = time_series - D.T @ miu_star
 
 plot_trend_time_series(x_l1, time_series, n, [r'$\hat{x}_{\ell_1}$', r'$y_t$'], f'Metoda Gradient Proiectat pentru rho = {rho}', 'c_mgp')
