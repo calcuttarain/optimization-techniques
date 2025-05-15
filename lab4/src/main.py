@@ -2,20 +2,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cvxpy as cp
 
-np.random.seed(22)
+MIU = 1e10
+np.random.seed(24)
 
-def generate_separable_points(m, n):
+def generate_separable_points(m, n, delta):
     w = np.random.randn(n)
     b = np.random.randn()
 
+    norm_w = np.linalg.norm(w)
+
     points, y = [], []
 
-    for _ in range (m):
+    while len(points) < m:
         x = np.random.randn(n)
+        margin = w @ x + b
 
-        y.append(1 if w @ x + b > 0 else -1)
-
-        points.append(x)
+        if margin >= delta * norm_w:
+            points.append(x)
+            y.append(1)
+        elif margin <= -delta * norm_w:
+            points.append(x)
+            y.append(-1)
 
     return points, y, w, b
 
@@ -55,6 +62,61 @@ def solve_separable_svm(X, y, m, n):
     problem.solve()
 
     return w_hat, b_hat
+
+'''
+Introduc produsul scalar in problema duala pentru SVM inseparabil ca o constanta mare ori o functie de g(x).
+Aleg acea functia patratica pentru ca e derivabila in 0 (spre deosebire de functia modul, spre exemplu).
+Astfel, avem o functie de penalizare care se asigura ca produsul scalar este 0.
+'''
+def f_svm_dual(Q, y, my_lambda):
+    sum_lambda = np.sum(my_lambda)
+
+    Q_lambda = Q @ my_lambda
+    Q_lambda_squared_norm = np.dot(Q_lambda, Q_lambda)
+
+    return - 1 / 2 * Q_lambda_squared_norm + sum_lambda - MIU * (y @ my_lambda) ** 2
+
+def gradient_svm_dual(Q, y, my_lambda):
+    return - Q.T @ Q @ my_lambda + np.ones(len(my_lambda)) - 2 * MIU * (y @ my_lambda) * y 
+
+def projection(my_lambda, rho):
+    return np.clip(my_lambda, 0, rho)
+
+def mgd_svm(Q, y, rho, c = .5, p = .5, numiter = 10000):
+    my_lambda = np.random.uniform(low = 0, high = rho, size = len(y))
+    my_lambda = projection(my_lambda, rho)
+
+    for _ in range (numiter):
+        gradient = gradient_svm_dual(Q, y, my_lambda)
+
+        alpha_k = 1.0
+        my_lambda_next = projection(my_lambda + alpha_k * gradient, rho)
+        stop = 0
+
+        # armijo
+        while f_svm_dual(Q, y, my_lambda_next) <= f_svm_dual(Q, y, my_lambda) + c * alpha_k * gradient @ (my_lambda_next - my_lambda):
+            alpha_k *= p 
+            my_lambda_next = projection(my_lambda + alpha_k * gradient, rho)
+
+            if stop == 0:
+                break 
+            stop -= 1
+
+        my_lambda = my_lambda_next
+
+    return my_lambda
+
+def compute_solution(Q, X, y, my_lambda):
+    # w_star scris matriceal
+    w_star = Q @ my_lambda
+
+    b_star_list = []
+
+    support_vectors = np.where(my_lambda > 0)[0]
+    for i in support_vectors:
+        b_star_list.append(y[i] - w_star @ X[i, :])
+
+    return w_star, b_star_list
 
 def myplot(X, y, w_hat, b_hat, filename, title, hypr = True):
     X = np.array(X)
@@ -99,25 +161,35 @@ def myplot(X, y, w_hat, b_hat, filename, title, hypr = True):
         ax.legend()
 
     plt.title(title)
-    # plt.savefig(f'../plots/{filename}.png', dpi = 300)
-    plt.show()
+    plt.savefig(f'../plots/{filename}.png', dpi = 300)
     plt.clf()
 
 
 # 1)
-m, n = 100, 2
-X, y, w, b = generate_separable_points(m, n)
+m, n, delta = 1000, 2, .3
+X, y, w, b = generate_separable_points(m, n, delta)
 w_hat, b_hat = solve_separable_svm(X, y, m, n)
-# myplot(X, y, w_hat.value, b_hat.value, 'separable_svm_2d', 'Separable SVM')
+myplot(X, y, w_hat.value, b_hat.value, 'separable_svm_2d', 'Separable SVM')
 
 
-m, n = 100, 3
-X, y, w, b = generate_separable_points(m, n)
+m, n, delta = 300, 3, .3
+X, y, w, b = generate_separable_points(m, n, delta)
 w_hat, b_hat = solve_separable_svm(X, y, m, n)
-# myplot(X, y, w_hat.value, b_hat.value, 'separable_svm_3d', 'Separable SVM')
+myplot(X, y, w_hat.value, b_hat.value, 'separable_svm_3d', 'Separable SVM')
 
 
 # 2)
-m, n, epsilon = 100, 2, 2.7
+m, n, epsilon = 30, 2, 2.5
 X, y, w, b = generate_inseparable_points(m, n, epsilon)
-myplot(X, y, w, b, 'inseparable_data_2d', 'Inseparable SVM')
+myplot(X, y, w, b, 'inseparable_data_2d', 'Inseparable SVM', hypr = False)
+
+X = np.array(X)
+y = np.array(y)
+
+Q = np.array([y[i] * X[i, :] for i in range(len(y))]).T
+
+rho = .2
+
+my_lambda_star = mgd_svm(Q, y, rho)
+w_star, b_star_list = compute_solution(Q, X, y, my_lambda_star)
+myplot(X, y, w_star, np.mean(b_star_list), 'solved_inseparable_svm_2d', 'Solved Inseparable SVM')
