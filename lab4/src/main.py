@@ -65,7 +65,7 @@ def solve_separable_svm(X, y, m, n):
 
 '''
 Introduc produsul scalar in problema duala pentru SVM inseparabil ca o constanta mare ori o functie de g(x).
-Aleg acea functia patratica pentru ca e derivabila in 0 (spre deosebire de functia modul, spre exemplu).
+Aleg functia patratica pentru ca e derivabila in 0 (spre deosebire de functia modul, spre exemplu).
 Astfel, avem o functie de penalizare care se asigura ca produsul scalar este 0.
 '''
 def f_svm_dual(Q, y, my_lambda):
